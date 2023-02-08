@@ -342,6 +342,7 @@ input:focus::placeholder {
   height: 70%;
   word-break: break-word;
   text-transform: capitalize;
+  text-align: center;
 }
 .each-note{
   border-radius: 5px;

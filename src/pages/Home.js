@@ -22,6 +22,7 @@ const Home = ({loggedIn}) => {
                     </motion.button>
                 </Link> 
                 :
+                <>
                 <Link to='/signin'>
                     <motion.button 
                             initial={{x: '100vw', rotate: 90}}
@@ -31,6 +32,16 @@ const Home = ({loggedIn}) => {
                             >Sign In
                     </motion.button>
                 </Link>
+                <Link to='/signup'>
+                    <motion.button 
+                            initial={{x: '-100vw', rotate: 90}}
+                            animate={{x: 0, rotate: 0}}
+                            transition={{delay: 0.1, duration: 1}}
+                            className='home-signin-btn'
+                            >Sign Up
+                    </motion.button>
+                </Link>
+                </>
                 }
             </div>
         </div>
