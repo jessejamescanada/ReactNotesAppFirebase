@@ -9,7 +9,7 @@ const Home = ({loggedIn}) => {
     <>
     <div className="home-container" >
         <div className="home-content" style={{backgroundImage: `url(${background})`}}>
-            <h1>My Nots</h1>
+            <h1>My Notes</h1>
             <div className="home-btn-container">
                 {loggedIn ? 
                     <Link to='/profile'>
