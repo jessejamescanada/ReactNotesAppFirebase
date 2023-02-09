@@ -319,6 +319,7 @@ svg{
   font-size: 1.2rem;
   font-weight: 600;
   box-shadow: 1px 1px 3px 0px #000000;
+  margin: 0;
 }
 
 input:focus::placeholder {
@@ -351,6 +352,7 @@ input:focus::placeholder {
   text-transform: capitalize;
   text-align: center;
 }
+
 .each-note{
   border-radius: 5px;
   position: relative;
@@ -364,6 +366,11 @@ input:focus::placeholder {
   align-items: center;
   background: rgb(255,255,255);
 background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(212,212,212,1) 100%);
+}
+.each-note .date{
+  position: absolute;
+  bottom: 14%;
+  font-size: 1rem;
 }
 .delete-btn{
   position: absolute;

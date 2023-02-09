@@ -12,7 +12,8 @@ const ProfileNotes = ({item, deleteNote, showUpdateNote, setNewNoteData, updateS
                   transition={{ duration: 1}} 
                   exit={{y: '-100vh', x: '100vw', rotate: 180, transition: {duration: 1.2}}}
     >
-    <li >{item.data.note}</li>
+    <li >{item.data.note} </li>
+    <p className='date'>{`${item.data.date}`}</p>
       <div className="note-btn-container">
         <FaTrash className='delete-btn' onClick={() => {deleteNote(item.id)}} />
         <button onClick={() => showEdit(item.id)}>Edit Note</button>

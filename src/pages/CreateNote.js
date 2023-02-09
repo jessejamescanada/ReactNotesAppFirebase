@@ -3,7 +3,7 @@ import {useState, useEffect} from 'react'
 import {getAuth, onAuthStateChanged} from 'firebase/auth'
 import {getStorage, ref, uploadBytesResumable, getDownloadURL} from 'firebase/storage'
 import { useNavigate } from 'react-router-dom'
-import {addDoc, collection} from 'firebase/firestore'
+import {addDoc, collection, serverTimestamp} from 'firebase/firestore'
 import {db} from '../firebase-config'
 import {v4 as uuidv4} from 'uuid'
 import { motion } from "framer-motion"
@@ -14,6 +14,7 @@ const CreateNote = ({setNewOriginalId}) => {
   const [addImg, setAddImg] = useState(false)
   const [imgQuestion, setImgQuestion] = useState(true)
   const [createNoteForm, setCreateNoteForm] = useState(true)
+  const [todayDate, setTodayDate] = useState('')
   const [error, setError] = useState('')
   const {note, images} = formData
   const auth = getAuth()
@@ -29,59 +30,73 @@ const CreateNote = ({setNewOriginalId}) => {
     })
   },[])
 
+  // imgs
   const imgSubmit = async e => {
-    e.preventDefault()
-// imgs
-  const storeImage = async (image) => {
-  return new Promise((resolve, reject) => {
-    const storage = getStorage()
-    const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`
+      e.preventDefault()
+      const storeImage = async (image) => {
+      return new Promise((resolve, reject) => {
+        const storage = getStorage()
+        const fileName = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`
 
-    const storeageRef = ref(storage, 'images/' + fileName)
-    const uploadTask = uploadBytesResumable(storeageRef, image)
+        const storeageRef = ref(storage, 'images/' + fileName)
+        const uploadTask = uploadBytesResumable(storeageRef, image)
 
-    uploadTask.on('state_changed', 
-  (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log('Upload is ' + progress + '% done');
-          switch (snapshot.state) {
-            case 'paused':
-              console.log('Upload is paused');
-              break;
-            case 'running':
-              console.log('Upload is running');
-              break;
-            }
-          }, 
-            (error) => {
-              reject(error)
+        uploadTask.on('state_changed', 
+      (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+              case 'paused':
+                console.log('Upload is paused');
+                break;
+              case 'running':
+                console.log('Upload is running');
+                break;
+              }
             }, 
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              resolve(downloadURL);
-            });
-          }
-        );
+              (error) => {
+                reject(error)
+              }, 
+            () => {
+              getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                resolve(downloadURL);
+              });
+            }
+          );
+        })
+      }
+        const imgUrls = await Promise.all(
+          [...images].map((image) => storeImage(image))
+            ).catch(() => {
+        return
       })
+      setImgQuestion(true)
+
+    const formDataCopy = {
+      ...formData,
+      imgUrls,
+      id: Math.floor(Math.random() * 100000000),
+      timestamp: serverTimestamp()
     }
-      const imgUrls = await Promise.all(
-        [...images].map((image) => storeImage(image))
-          ).catch(() => {
-      return
-    })
-    setImgQuestion(true)
+      delete formDataCopy.images
+      const docRef = await addDoc(collection(db, 'notes'), formDataCopy)
+      setNewOriginalId(formDataCopy.id)
 
-  const formDataCopy = {
-    ...formData,
-    imgUrls,
-    id: Math.floor(Math.random() * 100000000)
-  }
-    delete formDataCopy.images
-    const docRef = await addDoc(collection(db, 'notes'), formDataCopy)
-    setNewOriginalId(formDataCopy.id)
+      setAddImg(false)
+      setCreateNoteForm(true)
+}
 
-    setAddImg(false)
-    setCreateNoteForm(true)
+useEffect(() => {
+  currentDate()
+},[])
+
+const currentDate = () => {
+    let date = new Date()
+    date = date.toString().split(" ")
+    const slicedDate = date.slice(0, 4)
+    const stringDate = slicedDate.join(', ')
+    setTodayDate(stringDate)
+
 }
 
 // text
@@ -96,7 +111,9 @@ const CreateNote = ({setNewOriginalId}) => {
       }
         const formDataCopy = {
           ...formData,
-          id: Math.floor(Math.random() * 100000000)
+          id: Math.floor(Math.random() * 100000000),
+          timestamp: serverTimestamp(),
+          date: todayDate
       }
       delete formDataCopy.images
       const docRef = await addDoc(collection(db, 'notes'), formDataCopy)
