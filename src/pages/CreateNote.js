@@ -9,7 +9,7 @@ import {v4 as uuidv4} from 'uuid'
 import { motion } from "framer-motion"
 import '../App.css'
 
-const CreateNote = ({setNewOriginalId, notesArray}) => {
+const CreateNote = ({setNewOriginalId}) => {
   const [formData, setFormData] = useState({ note: '', images: {} })
   const [addImg, setAddImg] = useState(false)
   const [imgQuestion, setImgQuestion] = useState(true)
@@ -69,6 +69,7 @@ const CreateNote = ({setNewOriginalId, notesArray}) => {
           ).catch(() => {
       return
     })
+    setImgQuestion(true)
 
   const formDataCopy = {
     ...formData,
@@ -97,6 +98,7 @@ const CreateNote = ({setNewOriginalId, notesArray}) => {
           ...formData,
           id: Math.floor(Math.random() * 100000000)
       }
+      delete formDataCopy.images
       const docRef = await addDoc(collection(db, 'notes'), formDataCopy)
       // this new original id takes state from profile (where youre displaying a new note) and updating the state with a random ID which triggers a rerender by calling it in the useEffect dependency on <Profile/>
       setNewOriginalId(formDataCopy.id) 

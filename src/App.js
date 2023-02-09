@@ -31,7 +31,7 @@ function App() {
           {loggedIn ? <>
             <Route path='/' element={<Home loggedIn={loggedIn}/>} />
             <Route path='/profile' element={<PrivateRoute />}>
-              <Route path='/profile' element={<Profile />} />
+              <Route path='/profile' element={<Profile /> } />
             </Route>
           </>
           :

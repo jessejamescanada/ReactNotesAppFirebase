@@ -207,6 +207,10 @@ html, body{
   flex-direction: column;
 }
 
+.create-note-container{
+  width: 100vw;
+}
+
 .create-note-content{
   display: flex;
   flex-direction: column;
@@ -316,6 +320,7 @@ svg{
   font-weight: 600;
   box-shadow: 1px 1px 3px 0px #000000;
 }
+
 input:focus::placeholder {
   color: transparent;
 }
@@ -324,6 +329,7 @@ input:focus::placeholder {
 .profile-notes-container{
   width: 100%;
   display: flex;
+  justify-content: center;
 }
 .profile-notes-container ul{
   display: flex;
@@ -331,6 +337,7 @@ input:focus::placeholder {
   justify-content: center;
   flex-wrap: wrap;
   margin: 10px;
+  padding: 0;
   
 }
 .profile-notes-container ul li{
@@ -364,6 +371,12 @@ background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(212,212,212,1) 
   right: 2%;
   cursor: pointer;
   color: rgb(197, 0, 0);
+}
+.p{
+  display: flex;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 1.2rem;
 }
 .note-btn-container{
   width: 100%;

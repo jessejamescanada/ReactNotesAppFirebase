@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getFirestore} from 'firebase/firestore'
+import {getFirestore, initializeFirestore} from 'firebase/firestore'
 const firebaseConfig = {
   apiKey: "AIzaSyAJFffj09fTNQtShddH_4C2JdWBlTl5S4c",
   authDomain: "project-2814602599416604581.firebaseapp.com",
@@ -11,5 +11,5 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-initializeApp(firebaseConfig);
-export const db = getFirestore()
+const app = initializeApp(firebaseConfig);
+export const db = initializeFirestore(app, {ignoreUndefinedProperties: true})

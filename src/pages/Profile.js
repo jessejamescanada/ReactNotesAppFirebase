@@ -1,13 +1,13 @@
 import React from 'react'
-import {getAuth, updateProfile} from 'firebase/auth'
+import {getAuth} from 'firebase/auth'
 import {useState, useEffect} from 'react'
 import {db} from '../firebase-config'
 import {updateDoc, doc, collection, getDocs, query, where, deleteDoc} from 'firebase/firestore'
 import '../App.css'
 import CreateNote from './CreateNote'
-import { FaTrash } from 'react-icons/fa'
-import { motion } from "framer-motion"
-import EditButton from './EditButton'
+import { motion, AnimatePresence } from "framer-motion"
+import ProfileImage from './ProfileImage'
+import ProfileNotes from './ProfileNotes'
 
 const Profile = () => {
   const auth = getAuth()
@@ -17,12 +17,10 @@ const Profile = () => {
   const [newNoteData, setNewNoteData] = useState('')
   const [loading, setLoading] = useState(true)
   const [notesArray, setNotesArray] = useState(null)
-  const [changeDetails, setChangeDetails] = useState(false)
   const [formData, setFormData] = useState({
     name: auth.currentUser.displayName,
     email: auth.currentUser.email
   })
-  const { name, email } = formData
 
   // get 
   useEffect(() => {
@@ -44,7 +42,6 @@ const Profile = () => {
       setLoading(false)
     }
     fetchUserNotes()
-    console.log(notesArray)
   },[auth.currentUser.uid, newOriginalId])
 
   // delete
@@ -52,15 +49,6 @@ const Profile = () => {
     const noteDoc = doc(db, 'notes', id)
     await deleteDoc(noteDoc)
     setNewOriginalId(Math.floor(Math.random() * 1000000))
-  }
-
-
-  // edit form
-  const onChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.id]: e.target.value
-    }))
   }
   
   const updateSubmit = async(id, note) => {
@@ -78,10 +66,7 @@ const Profile = () => {
 
   const showEdit = (id) => {
     console.log(id)
-  
     setShowUpdateNote( id)
-
-    console.log(showUpdateNote)
   }
 
   return (
@@ -89,64 +74,40 @@ const Profile = () => {
     <div className='profile-container'>
       <div className="profile-content">
         <header className='welcome-back'>
-          <p>Welcome Back <motion.div
+          <div className='p'>Welcome Back <motion.div
                         initial={{x: 0, rotate: 5}}
                         animate={{x: 0, rotate: -5}}
                         transition={{delay: 0.2, duration: 1, repeat: Infinity, repeatType: 'reverse'}}
                         className='welcome-name'
                 >{formData.name}
-          </motion.div>!</p>
+          </motion.div>!</div>
         </header>
         <main>
-          <div className="profile-details-and-button">
-          </div>
-          <div className="profile-card">
-            <form>
-              {changeDetails ? 
-                  <input type="text"
-                      id='name'
-                      value={name}
-                      onChange={onChange}
-                  />  
-            : ''}
-            </form>
-          </div>
-          <CreateNote setNewOriginalId={setNewOriginalId} notesArray={notesArray} />
-          {notesArray ? (
-            <>
-            <div className="profile-notes-container">
-            <ul>
-                {notesArray.map((item) => (
+         
+          <CreateNote setNewOriginalId={setNewOriginalId} />
+         {notesArray ? (
+              <>
+              <div className="profile-notes-container">
+              <ul>
+                <AnimatePresence>
+                  {notesArray.map((item) => (
+                    item.data.imgUrls ? (
 
-                  item.data.imgUrls ? (
-                  <div className='each-note'>
-                      <img src={item.data.imgUrls} alt="" className='uploaded-img' />
-                      <div className="note-btn-container">
-                      <FaTrash className='delete-btn' onClick={() => {deleteNote(item.id)}} />
-                    </div>
-                  </div>) 
-                  :<>
+                    <ProfileImage item={item} deleteNote={deleteNote} key={item.id}/>
+                
+                  ) :
 
-                  <div className="each-note">
-                  <li>{item.data.note}</li>
-                    <div className="note-btn-container">
-                      <FaTrash className='delete-btn' onClick={() => {deleteNote(item.id)}} />
-                      <button onClick={() => showEdit(item.id)}>Edit Note</button>
-                      {/* <button onClick={() => {setShowUpdateNote(prevState => !prevState)}}>Edit Note</button> */}
-                    </div>
-                    {showUpdateNote === item.id ? 
-                    <EditButton setNewNoteData={setNewNoteData} updateSubmit={updateSubmit} item={item} newNoteData={newNoteData}/>
-                  : ''}
+                  <ProfileNotes item={item} deleteNote={deleteNote} showUpdateNote={showUpdateNote} setNewNoteData={setNewNoteData} updateSubmit={updateSubmit} newNoteData={newNoteData} key={item.id} showEdit={showEdit}/>
+
+                  ))}
+                  </AnimatePresence>
+                  <div className="img">
+                      <img src={notesArray.imgUrls} alt="" />
                   </div>
-                </>
-                ))}
-                <div className="img">
-                    <img src={notesArray.imgUrls} alt="" />
-                </div>
-              </ul>
-            </div>
-            </>
-          ) : ''}
+                </ul>
+              </div>
+              </>
+            ) : ''}
         </main>
       </div>
     </div>
@@ -155,3 +116,39 @@ const Profile = () => {
 }
 
 export default Profile
+
+// {notesArray ? (
+//   <>
+//   <div className="profile-notes-container">
+//   <ul>
+//       {notesArray.map((item) => (
+//         item.data.imgUrls ? (
+//         <div className='each-note' >
+//             <img src={item.data.imgUrls} alt="" className='uploaded-img' />
+//             <div className="note-btn-container">
+//             <FaTrash className='delete-btn' onClick={() => {deleteNote(item.id)}} />
+//           </div>
+//         </div>) 
+        
+//         :<>
+
+//         <div className="each-note">
+//         <li key={item.data.id}>{item.data.note}</li>
+//           <div className="note-btn-container">
+//             <FaTrash className='delete-btn' onClick={() => {deleteNote(item.id)}} />
+//             <button onClick={() => showEdit(item.id)}>Edit Note</button>
+
+//           </div>
+//           {showUpdateNote === item.id ? 
+//           <EditButton setNewNoteData={setNewNoteData} updateSubmit={updateSubmit} item={item} newNoteData={newNoteData}/>
+//         : ''}
+//         </div>
+//       </>
+//       ))}
+//       <div className="img">
+//           <img src={notesArray.imgUrls} alt="" />
+//       </div>
+//     </ul>
+//   </div>
+//   </>
+// ) : ''}
